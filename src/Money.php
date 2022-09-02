@@ -164,11 +164,8 @@ final class Money implements Arrayable, Jsonable, Stringable, \JsonSerializable
             $value = Money::fromCents($value, $this->getCurrency());
         }
 
-        return new static(
-            $this->instance->plus(
-                $value->multiply($this->getDivider()),
-                static::$roundingMode
-            )->getMinorAmount(), $this->getCurrency(), $this->scale);
+        return new static($this->instance->minus($value->multiply($this->getDivider()))->getMinorAmount()
+            , $this->instance->getCurrency(), $this->scale);
     }
 
     public function multiply($value): Money
