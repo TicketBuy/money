@@ -4,18 +4,11 @@ namespace Supplycart\Money;
 
 class Currency
 {
-    const MYR = 'MYR';
-    const IDR = 'IDR';
-    const SGD = 'SGD';
-    const HKD = 'HKD';
-    const VND = 'VND';
-    const THB = 'THB';
-    const BND = 'BND';
-    const PHP = 'PHP';
+    const EUR = 'EUR';
 
     public static function default()
     {
-        return self::MYR;
+        return self::EUR;
     }
 
     public static function options()
