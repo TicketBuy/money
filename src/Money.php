@@ -22,14 +22,14 @@ final class Money implements Arrayable, Jsonable, Stringable, \JsonSerializable
 
     public static int $roundingMode = RoundingMode::HALF_UP;
 
-    public function __construct($amount = 0, string $currency = Currency::MYR, $scale = 2)
+    public function __construct($amount = 0, string $currency = Currency::EUR, $scale = 2)
     {
         $this->instance = BrickMoney::ofMinor($amount ?? 0, $currency, new CustomContext($scale),
             static::$roundingMode);
         $this->scale = $scale;
     }
 
-    public static function of($amount = 0, string $currency = Currency::MYR, $decimal = 2)
+    public static function of($amount = 0, string $currency = Currency::EUR, $decimal = 2)
     {
         return new static($amount, $currency, $decimal);
     }
@@ -62,14 +62,14 @@ final class Money implements Arrayable, Jsonable, Stringable, \JsonSerializable
         return new static($value, $currency);
     }
 
-    public static function fromCents(int $amount, string $currency = Currency::MYR)
+    public static function fromCents(int $amount, string $currency = Currency::EUR)
     {
         $instance = BrickMoney::ofMinor($amount, $currency);
 
         return new static($instance->getMinorAmount(), $currency);
     }
 
-    public static function fromDecimal(string $amount, string $currency = Currency::MYR)
+    public static function fromDecimal(string $amount, string $currency = Currency::EUR)
     {
         $instance = BrickMoney::of($amount, $currency);
 
@@ -232,7 +232,7 @@ final class Money implements Arrayable, Jsonable, Stringable, \JsonSerializable
         return new static($beforeTax->getMinorAmount(), $this->getCurrency(), $this->scale);
     }
 
-    public static function zero(string $currency = Currency::MYR): Money
+    public static function zero(string $currency = Currency::EUR): Money
     {
         return new static(0, $currency);
     }
