@@ -6,8 +6,8 @@ use Supplycart\Money\Locale;
 
 return [
     'default' => [
-        'country' => Country::MALAYSIA,
-        'currency' => Currency::MYR,
-        'locale' => Locale::$countries[Country::MALAYSIA],
+        'country' => Country::THE_NETHERLANDS,
+        'currency' => Currency::EUR,
+        'locale' => Locale::$countries[Country::THE_NETHERLANDS],
     ],
 ];
