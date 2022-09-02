@@ -135,6 +135,19 @@ final class Money implements Arrayable, Jsonable, Stringable, \JsonSerializable
             )->getMinorAmount(), $this->getCurrency(), $this->scale);
     }
 
+    public function addCents($value)
+    {
+        if (!$value instanceof Money) {
+            $value = Money::fromCents($value, $this->getCurrency());
+        }
+
+        return new static(
+            $this->instance->plus(
+                $value->multiply($this->getDivider()),
+                static::$roundingMode
+            )->getMinorAmount(), $this->getCurrency(), $this->scale);
+    }
+
     public function subtract($value): Money
     {
         if (!$value instanceof Money) {
@@ -143,6 +156,19 @@ final class Money implements Arrayable, Jsonable, Stringable, \JsonSerializable
 
         return new static($this->instance->minus($value->multiply($this->getDivider()))->getMinorAmount()
             , $this->instance->getCurrency(), $this->scale);
+    }
+
+    public function subtractCents($value)
+    {
+        if (!$value instanceof Money) {
+            $value = Money::fromCents($value, $this->getCurrency());
+        }
+
+        return new static(
+            $this->instance->plus(
+                $value->multiply($this->getDivider()),
+                static::$roundingMode
+            )->getMinorAmount(), $this->getCurrency(), $this->scale);
     }
 
     public function multiply($value): Money
