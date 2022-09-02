@@ -4,20 +4,11 @@ namespace Supplycart\Money;
 
 class Country
 {
-    const MALAYSIA = 'Malaysia';
-    const SINGAPORE = 'Singapore';
-    const THAILAND = 'Thailand';
-    const INDONESIA = 'Indonesia';
-    const PHILIPPINES = 'Philippines';
-    const VIETNAM = 'Vietnam';
-    const HONG_KONG = 'Hong Kong';
-    const BRUNEI = 'Brunei';
-    const CAMBODIA = 'Cambodia';
-    const MYANMAR = 'Myanmar';
+    const THE_NETHERLANDS = 'The Netherlands';
 
     public static function default()
     {
-        return self::MALAYSIA;
+        return self::THE_NETHERLANDS;
     }
 
     public static function options()
