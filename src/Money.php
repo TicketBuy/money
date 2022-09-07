@@ -112,9 +112,9 @@ final class Money implements Arrayable, Jsonable, Stringable, \JsonSerializable
         return $this->instance->formatTo($locale);
     }
 
-    public function toNumberFormat($decimal = 2)
+    public function toNumberFormat($decimal = 2, $decimal_seperator = '.', $thousands_separator = ',')
     {
-        return number_format($this->getDecimalAmount(), $decimal);
+        return number_format($this->getDecimalAmount(), $decimal, $decimal_seperator, $thousands_separator);
     }
 
     public function getCurrency(): string
@@ -286,7 +286,7 @@ final class Money implements Arrayable, Jsonable, Stringable, \JsonSerializable
         return json_encode($this->toArray(), $options);
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->toArray();
     }
