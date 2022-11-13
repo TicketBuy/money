@@ -98,7 +98,7 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
 
     public function toRational()
     {
-        return RationalMoney::of($this->instance->getAmount()->toBigRational(), $this->instance->getCurrency());
+        return new RationalMoney($this->instance->getAmount()->toBigRational(), $this->instance->getCurrency());
     }
 
     /**
