@@ -10,6 +10,7 @@ use Brick\Money\Context\CustomContext;
 use Brick\Money\Exception\MoneyMismatchException;
 use Brick\Money\Exception\UnknownCurrencyException;
 use Brick\Money\Money as BrickMoney;
+use Brick\Money\Currency as BrickCurrency;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
@@ -104,7 +105,7 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
     /**
      * @throws UnknownCurrencyException
      */
-    public static function fromRational(RationalMoney $amount, Context $context, string $currency = Currency::EUR): Money
+    public static function fromRational(RationalMoney $amount, Context $context, BrickCurrency $currency): Money
     {
         $instance = $amount->to($context, self::$roundingMode);
 
