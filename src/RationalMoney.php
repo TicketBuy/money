@@ -5,12 +5,13 @@ namespace Supplycart\Money;
 use Brick\Math\BigRational;
 use Brick\Money\Exception\MoneyMismatchException;
 use Brick\Money\RationalMoney as BrickRationalMoney;
+use Brick\Money\Currency as BrickCurrency;
 
 final class RationalMoney
 {
     private BrickRationalMoney $instance;
 
-    public function __construct(BigRational $amount, string $currency = Currency::EUR)
+    public function __construct(BigRational $amount, BrickCurrency $currency)
     {
         $this->instance = new BrickRationalMoney($amount, $currency);
     }
@@ -18,6 +19,10 @@ final class RationalMoney
     public static function of($amount, $currency): RationalMoney
     {
         $amount = BigRational::of($amount);
+
+        if (! $currency instanceof BrickCurrency) {
+            $currency = BrickCurrency::of($currency);
+        }
 
         return new RationalMoney($amount, $currency);
     }
