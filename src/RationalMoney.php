@@ -3,9 +3,11 @@
 namespace Supplycart\Money;
 
 use Brick\Math\BigRational;
-use Brick\Money\Exception\MoneyMismatchException;
-use Brick\Money\RationalMoney as BrickRationalMoney;
+use Brick\Money\Context;
 use Brick\Money\Currency as BrickCurrency;
+use Brick\Money\Exception\MoneyMismatchException;
+use Brick\Money\Money as BrickMoney;
+use Brick\Money\RationalMoney as BrickRationalMoney;
 
 final class RationalMoney
 {
@@ -30,6 +32,11 @@ final class RationalMoney
     public function getAmount(): BigRational
     {
         return $this->instance->getAmount();
+    }
+
+    public function to(Context $context, int $roundingMode): BrickMoney
+    {
+        return $this->instance->to($context, $roundingMode);
     }
 
     /**
