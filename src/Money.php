@@ -97,6 +97,11 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         return new Money($instance->getMinorAmount(), $currency);
     }
 
+    public function toRational()
+    {
+        return new RationalMoney($this->instance->getAmount()->toBigRational(), $this->instance->getCurrency());
+    }
+
     /**
      * @throws UnknownCurrencyException
      */
