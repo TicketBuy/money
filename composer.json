@@ -2,14 +2,15 @@
   "name": "supplycart/money",
   "description": "Package to handle money operation for supplycart",
   "require": {
-    "php": "^7.4|^8.0",
+    "php": "^8.0",
     "ext-json": "*",
     "ext-intl": "*",
-    "brick/money": "^0.6.0"
+    "brick/money": "^0.8.0"
   },
   "require-dev": {
-    "orchestra/testbench": "^6.2",
-    "orchestra/canvas": "^6.0"
+    "roave/security-advisories": "dev-latest",
+    "orchestra/testbench": "^7.22",
+    "orchestra/canvas": "^7.5"
   },
   "autoload": {
     "psr-4": {
@@ -33,6 +34,10 @@
     {
       "name": "Azri Ismail",
       "email": "mazri.iar@gmail.com"
+    },
+    {
+      "name": "Reno Looijmans",
+      "email": "info@renolooijmans.nl"
     }
   ]
 }

@@ -8,14 +8,14 @@ use Supplycart\Money\Money;
 
 class MoneyValue implements CastsAttributes
 {
-    public function get($model, string $key, $value, array $attributes)
+    public function get($model, string $key, $value, array $attributes): Money
     {
         $scale = method_exists($model, 'getDecimalValue') ? $model->getDecimalValue() : 2;
 
         return new Money($value, $model->currency ?? Currency::default(), $scale);
     }
 
-    public function set($model, string $key, $value, array $attributes)
+    public function set($model, string $key, mixed $value, array $attributes)
     {
         if ($value instanceof Money) {
             return $value->getAmount();

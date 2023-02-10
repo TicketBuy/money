@@ -39,17 +39,11 @@ final class RationalMoney
         return $this->instance->to($context, $roundingMode);
     }
 
-    /**
-     * @throws MoneyMismatchException
-     */
     public function add($value): RationalMoney
     {
         return new RationalMoney($this->instance->plus($value)->getAmount(), $this->instance->getCurrency());
     }
 
-    /**
-     * @throws MoneyMismatchException
-     */
     public function subtract($value): RationalMoney
     {
         return new RationalMoney($this->instance->minus($value)->getAmount(), $this->instance->getCurrency());

@@ -3,7 +3,6 @@
 namespace Supplycart\Money;
 
 use Illuminate\Support\ServiceProvider;
-use Supplycart\Money\Console\InstallCommand;
 
 class MoneyServiceProvider extends ServiceProvider
 {
@@ -12,7 +11,7 @@ class MoneyServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->mergeConfigFrom(
             __DIR__ . '/../config/money.php', 'money'
@@ -24,7 +23,7 @@ class MoneyServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->publishes([
             __DIR__ . '/../config/money.php' => config_path('money.php'),

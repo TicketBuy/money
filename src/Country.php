@@ -4,14 +4,14 @@ namespace Supplycart\Money;
 
 class Country
 {
-    const THE_NETHERLANDS = 'The Netherlands';
+    public const THE_NETHERLANDS = 'The Netherlands';
 
-    public static function default()
+    public static function default(): string
     {
         return self::THE_NETHERLANDS;
     }
 
-    public static function options()
+    public static function options(): array
     {
         $class = new \ReflectionClass(__CLASS__);
 

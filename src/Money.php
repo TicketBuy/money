@@ -7,14 +7,13 @@ use Brick\Math\BigRational;
 use Brick\Math\RoundingMode;
 use Brick\Money\Context;
 use Brick\Money\Context\CustomContext;
-use Brick\Money\Exception\MoneyMismatchException;
-use Brick\Money\Exception\UnknownCurrencyException;
 use Brick\Money\Money as BrickMoney;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use JsonException;
 use JsonSerializable;
-use Supplycart\Money\Contracts\Tax as TaxContract;
 use Stringable;
+use Supplycart\Money\Contracts\Tax as TaxContract;
 
 final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
 {
@@ -26,9 +25,6 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
 
     public static int $roundingMode = RoundingMode::HALF_UP;
 
-    /**
-     * @throws UnknownCurrencyException
-     */
     public function __construct($amount = 0, string $currency = Currency::EUR, $scale = 2)
     {
         $this->instance = BrickMoney::ofMinor($amount ?? 0,
@@ -39,20 +35,11 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         $this->scale = $scale;
     }
 
-    /**
-     * @throws UnknownCurrencyException
-     */
     public static function of($amount = 0, string $currency = Currency::EUR, $decimal = 2): Money
     {
         return new Money($amount, $currency, $decimal);
     }
 
-    /**
-     * @param int|float|array|Money|BrickMoney $value
-     * @param null $currency
-     * @return static
-     * @throws UnknownCurrencyException
-     */
     public static function parse($value, $currency = null): Money
     {
         $currency = $currency ?? Currency::default();
@@ -76,9 +63,6 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         return new Money($value, $currency);
     }
 
-    /**
-     * @throws UnknownCurrencyException
-     */
     public static function fromCents(int $amount, string $currency = Currency::EUR): Money
     {
         $instance = BrickMoney::ofMinor($amount, $currency);
@@ -86,9 +70,6 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         return new Money($instance->getMinorAmount(), $currency);
     }
 
-    /**
-     * @throws UnknownCurrencyException
-     */
     public static function fromDecimal(string $amount, string $currency = Currency::EUR): Money
     {
         $instance = BrickMoney::of($amount, $currency);
@@ -96,14 +77,11 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         return new Money($instance->getMinorAmount(), $currency);
     }
 
-    public function toRational()
+    public function toRational(): RationalMoney
     {
         return new RationalMoney($this->instance->getAmount()->toBigRational(), $this->instance->getCurrency());
     }
 
-    /**
-     * @throws UnknownCurrencyException
-     */
     public static function fromRational(RationalMoney $amount, Context $context, string $currency = Currency::EUR): Money
     {
         $instance = $amount->to($context, self::$roundingMode);
@@ -119,28 +97,12 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
             ->toInt();
     }
 
-    public function getDecimalAmount($scale = 2): string
+    public function getDecimalAmount(): string
     {
         return $this->instance
             ->getAmount()
             ->dividedBy($this->getDivider(), $this->scale, self::$roundingMode)
             ->toScale($this->scale, self::$roundingMode);
-    }
-
-    /**
-     * @deprecated use `getDecimalAmount()`
-     */
-    public function toDecimal(): string
-    {
-        return $this->getDecimalAmount();
-    }
-
-    /**
-     * @deprecated use `format()`
-     */
-    public function toCurrencyFormat(): string
-    {
-        return $this->format();
     }
 
     public function format($locale = null): string
@@ -150,9 +112,9 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         return $this->instance->formatTo($locale);
     }
 
-    public function toNumberFormat($decimal = 2, $decimal_seperator = '.', $thousands_separator = ','): string
+    public function toNumberFormat($decimal = 2, $decimal_separator = '.', $thousands_separator = ','): string
     {
-        return number_format($this->getDecimalAmount(), $decimal, $decimal_seperator, $thousands_separator);
+        return number_format($this->getDecimalAmount(), $decimal, $decimal_separator, $thousands_separator);
     }
 
     public function getContext(): Context
@@ -165,10 +127,6 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         return (string) $this->instance->getCurrency();
     }
 
-    /**
-     * @throws UnknownCurrencyException
-     * @throws MoneyMismatchException
-     */
     public function add($value): Money
     {
         if (!$value instanceof self) {
@@ -182,10 +140,6 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
             )->getMinorAmount(), $this->getCurrency(), $this->scale);
     }
 
-    /**
-     * @throws UnknownCurrencyException
-     * @throws MoneyMismatchException
-     */
     public function addCents($value): Money
     {
         if (!$value instanceof self) {
@@ -199,10 +153,6 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
             )->getMinorAmount(), $this->getCurrency(), $this->scale);
     }
 
-    /**
-     * @throws UnknownCurrencyException
-     * @throws MoneyMismatchException
-     */
     public function subtract($value): Money
     {
         if (!$value instanceof self) {
@@ -214,10 +164,6 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
             $this->scale);
     }
 
-    /**
-     * @throws UnknownCurrencyException
-     * @throws MoneyMismatchException
-     */
     public function subtractCents($value): static
     {
         if (!$value instanceof self) {
@@ -228,9 +174,6 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
             $this->instance->getCurrency(), $this->scale);
     }
 
-    /**
-     * @throws UnknownCurrencyException
-     */
     public function multiply($value): Money
     {
         $value = $this->instance->multipliedBy($value, self::$roundingMode);
@@ -238,9 +181,6 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         return new Money($value->getMinorAmount(), $value->getCurrency(), $this->scale);
     }
 
-    /**
-     * @throws UnknownCurrencyException
-     */
     public function divide($value): Money
     {
         $value = $this->instance->dividedBy($value, self::$roundingMode);
@@ -255,9 +195,6 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         return $this;
     }
 
-    /**
-     * @throws UnknownCurrencyException
-     */
     public function getTaxAmount($quantity = 1): Money
     {
         if (!$this->tax) {
@@ -272,9 +209,6 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         return self::of($taxValue->getMinorAmount(), $this->getCurrency(), $this->scale);
     }
 
-    /**
-     * @throws UnknownCurrencyException
-     */
     public function getTaxAmountFromInclusiveTax(): Money
     {
         if (!$this->tax) {
@@ -295,14 +229,12 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
             return BigDecimal::zero();
         }
 
+        // Take a tax rate of decimals into account, hence $this->scale + 2.
         return BigRational::of($this->tax->getTaxRate())
             ->dividedBy(100)
-            ->toScale($this->scale, self::$roundingMode);
+            ->toScale($this->scale + 2, self::$roundingMode);
     }
 
-    /**
-     * @throws UnknownCurrencyException
-     */
     public function afterTax($quantity = 1): Money
     {
         if (!$this->tax) {
@@ -317,9 +249,6 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         return new Money($afterTax->getMinorAmount(), $this->getCurrency(), $this->scale);
     }
 
-    /**
-     * @throws UnknownCurrencyException
-     */
     public function beforeTax(): Money
     {
         if (!$this->tax) {
@@ -333,9 +262,6 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         return new Money($beforeTax->getMinorAmount(), $this->getCurrency(), $this->scale);
     }
 
-    /**
-     * @throws UnknownCurrencyException
-     */
     public static function zero(string $currency = Currency::EUR): Money
     {
         return new Money(0, $currency);
@@ -363,30 +289,26 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
     }
 
     /**
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function toJson($options = 0): bool|string
     {
         return json_encode($this->toArray(), JSON_THROW_ON_ERROR | $options);
     }
 
-    public function jsonSerialize(): mixed
+    public function jsonSerialize(): array
     {
         return $this->toArray();
     }
 
     /**
      * This function is to cater more than two decimal points
-     * @return int
      */
     public function getDivider(): int
     {
         return $this->scale === 2 ? 1 : 10 ** ($this->scale - 2);
     }
 
-    /**
-     * @throws UnknownCurrencyException
-     */
     public function convertToDifferentDecimalPoint(int $newDecimalPoint): Money
     {
         $differenceInScale = $newDecimalPoint - $this->scale;

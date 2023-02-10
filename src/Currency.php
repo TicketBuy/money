@@ -4,17 +4,15 @@ namespace Supplycart\Money;
 
 class Currency
 {
-    const EUR = 'EUR';
+    public const EUR = 'EUR';
 
-    public static function default()
+    public static function default(): string
     {
         return self::EUR;
     }
 
-    public static function options()
+    public static function options(): array
     {
-        $class = new \ReflectionClass(__CLASS__);
-
-        return $class->getConstants();
+        return (new \ReflectionClass(__CLASS__))->getConstants();
     }
 }
