@@ -8,8 +8,8 @@
     "brick/money": "^0.8.0"
   },
   "require-dev": {
-    "orchestra/testbench": "^7.22",
-    "orchestra/canvas": "^7.5"
+    "orchestra/testbench": "^8.3.1",
+    "orchestra/canvas": "^8.1.2"
   },
   "autoload": {
     "psr-4": {
@@ -29,6 +29,8 @@
     }
   },
   "license": "MIT",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
   "authors": [
     {
       "name": "Azri Ismail",
