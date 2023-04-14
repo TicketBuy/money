@@ -2,6 +2,8 @@
 
 namespace Supplycart\Money;
 
+use ReflectionClass;
+
 class Currency
 {
     public const EUR = 'EUR';
@@ -13,6 +15,6 @@ class Currency
 
     public static function options(): array
     {
-        return (new \ReflectionClass(__CLASS__))->getConstants();
+        return (new ReflectionClass(__CLASS__))->getConstants();
     }
 }

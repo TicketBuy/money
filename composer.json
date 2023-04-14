@@ -2,13 +2,12 @@
   "name": "supplycart/money",
   "description": "Package to handle money operation for supplycart",
   "require": {
-    "php": "^8.0",
+    "php": "^8.1",
     "ext-json": "*",
     "ext-intl": "*",
     "brick/money": "^0.8.0"
   },
   "require-dev": {
-    "roave/security-advisories": "dev-latest",
     "orchestra/testbench": "^7.22",
     "orchestra/canvas": "^7.5"
   },

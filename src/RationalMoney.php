@@ -5,7 +5,6 @@ namespace Supplycart\Money;
 use Brick\Math\BigRational;
 use Brick\Money\Context;
 use Brick\Money\Currency as BrickCurrency;
-use Brick\Money\Exception\MoneyMismatchException;
 use Brick\Money\Money as BrickMoney;
 use Brick\Money\RationalMoney as BrickRationalMoney;
 

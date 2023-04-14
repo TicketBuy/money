@@ -2,6 +2,8 @@
 
 namespace Supplycart\Money;
 
+use ReflectionClass;
+
 class Country
 {
     public const THE_NETHERLANDS = 'The Netherlands';
@@ -13,7 +15,7 @@ class Country
 
     public static function options(): array
     {
-        $class = new \ReflectionClass(__CLASS__);
+        $class = new ReflectionClass(__CLASS__);
 
         $values = array_values($class->getConstants());
 

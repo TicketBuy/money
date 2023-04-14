@@ -5,7 +5,7 @@ namespace Supplycart\Money\Contracts;
 interface Tax
 {
     /**
-     * @return string Tax rate in string. e.g 10% tax rate => '10.0'
+     * @return string Tax rate in string. e.g. 10% tax rate => '10.0'
      */
     public function getTaxRate(): string;
 
