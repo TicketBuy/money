@@ -7,6 +7,7 @@ use Brick\Math\BigRational;
 use Brick\Math\RoundingMode;
 use Brick\Money\Context;
 use Brick\Money\Context\CustomContext;
+use Brick\Money\Currency as BrickCurrency;
 use Brick\Money\Money as BrickMoney;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -27,11 +28,12 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
 
     public function __construct($amount = 0, string $currency = Currency::EUR, $scale = 2)
     {
-        $this->instance = BrickMoney::ofMinor($amount ?? 0,
+        $this->instance = $this->createInstance(
+            $amount ?? 0,
             $currency,
-            new CustomContext($scale),
-            self::$roundingMode);
-
+            $scale
+        );
+		
         $this->scale = $scale;
     }
 
@@ -136,8 +138,11 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         return new Money(
             $this->instance->plus(
                 $value->multiply($this->getDivider()),
-                self::$roundingMode
-            )->getMinorAmount(), $this->getCurrency(), $this->scale);
+					static::$roundingMode
+				)->getMinorAmount(),
+				$this->getCurrency(),
+				$this->scale
+			);
     }
 
     public function addCents($value): Money
@@ -149,8 +154,11 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         return new Money(
             $this->instance->plus(
                 $value->multiply($this->getDivider()),
-                self::$roundingMode
-            )->getMinorAmount(), $this->getCurrency(), $this->scale);
+                static::$roundingMode
+            )->getMinorAmount(),
+            $this->getCurrency(),
+            $this->scale
+        );
     }
 
     public function subtract($value): Money
@@ -158,10 +166,12 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         if (!$value instanceof self) {
             $value = self::of($value, $this->getCurrency(), $this->scale);
         }
-
-        return new Money($this->instance->minus($value->multiply($this->getDivider()))->getMinorAmount(),
+		
+		return new static(
+            $this->instance->minus($value->multiply($this->getDivider()))->getMinorAmount(),
             $this->instance->getCurrency(),
-            $this->scale);
+            $this->scale
+        );
     }
 
     public function subtractCents($value): static
@@ -169,9 +179,12 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         if (!$value instanceof self) {
             $value = self::fromCents($value, $this->getCurrency());
         }
-
-        return new Money($this->instance->minus($value->multiply($this->getDivider()))->getMinorAmount(),
-            $this->instance->getCurrency(), $this->scale);
+		
+        return new static(
+            $this->instance->minus($value->multiply($this->getDivider()))->getMinorAmount(),
+            $this->instance->getCurrency(),
+            $this->scale
+        );
     }
 
     public function multiply($value): Money
@@ -320,5 +333,17 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
             : $this->instance->dividedBy($dividerOrMultiplier, self::$roundingMode);
 
         return new Money($newValue->getMinorAmount(), $newValue->getCurrency(), $newDecimalPoint);
+    }
+
+    private function createInstance($amount = 0, string $currency = Currency::MYR, $scale = 2)
+    {
+
+        $currency = BrickCurrency::of($currency);
+        $currency = new BrickCurrency($currency->getCurrencyCode(), $currency->getNumericCode(), $currency->getName(), 2);
+
+        $context = new CustomContext($scale);
+        $amount = BigRational::of($amount)->dividedBy(10 ** $currency->getDefaultFractionDigits());
+
+        return BrickMoney::create($amount, $currency, $context, static::$roundingMode);
     }
 }
