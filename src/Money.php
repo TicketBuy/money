@@ -33,7 +33,7 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
             $currency,
             $scale
         );
-		
+
         $this->scale = $scale;
     }
 
@@ -138,7 +138,7 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         return new Money(
             $this->instance->plus(
                 $value->multiply($this->getDivider()),
-					static::$roundingMode
+					self::$roundingMode
 				)->getMinorAmount(),
 				$this->getCurrency(),
 				$this->scale
@@ -154,7 +154,7 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         return new Money(
             $this->instance->plus(
                 $value->multiply($this->getDivider()),
-                static::$roundingMode
+                self::$roundingMode
             )->getMinorAmount(),
             $this->getCurrency(),
             $this->scale
@@ -167,7 +167,7 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
             $value = self::of($value, $this->getCurrency(), $this->scale);
         }
 		
-		return new static(
+		return new Money(
             $this->instance->minus($value->multiply($this->getDivider()))->getMinorAmount(),
             $this->instance->getCurrency(),
             $this->scale
@@ -180,7 +180,7 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
             $value = self::fromCents($value, $this->getCurrency());
         }
 		
-        return new static(
+        return new Money(
             $this->instance->minus($value->multiply($this->getDivider()))->getMinorAmount(),
             $this->instance->getCurrency(),
             $this->scale
@@ -335,15 +335,14 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         return new Money($newValue->getMinorAmount(), $newValue->getCurrency(), $newDecimalPoint);
     }
 
-    private function createInstance($amount = 0, string $currency = Currency::MYR, $scale = 2)
+    private function createInstance($amount = 0, string $currency = Currency::EUR, $scale = 2)
     {
-
-        $currency = BrickCurrency::of($currency);
-        $currency = new BrickCurrency($currency->getCurrencyCode(), $currency->getNumericCode(), $currency->getName(), 2);
+        $brickCurrency = BrickCurrency::of($currency);
+        $brickCurrency = new BrickCurrency($brickCurrency->getCurrencyCode(), $brickCurrency->getNumericCode(), $brickCurrency->getName(), 2);
 
         $context = new CustomContext($scale);
-        $amount = BigRational::of($amount)->dividedBy(10 ** $currency->getDefaultFractionDigits());
+        $bigRational = BigRational::of($amount)->dividedBy(10 ** $brickCurrency->getDefaultFractionDigits());
 
-        return BrickMoney::create($amount, $currency, $context, static::$roundingMode);
+        return BrickMoney::create($bigRational, $brickCurrency, $context, self::$roundingMode);
     }
 }
