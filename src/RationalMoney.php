@@ -3,6 +3,7 @@
 namespace Supplycart\Money;
 
 use Brick\Math\BigRational;
+use Brick\Math\RoundingMode;
 use Brick\Money\Context;
 use Brick\Money\Currency as BrickCurrency;
 use Brick\Money\Money as BrickMoney;
@@ -33,7 +34,7 @@ final class RationalMoney
         return $this->instance->getAmount();
     }
 
-    public function to(Context $context, int $roundingMode): BrickMoney
+    public function to(Context $context, RoundingMode $roundingMode): BrickMoney
     {
         return $this->instance->to($context, $roundingMode);
     }
