@@ -6,11 +6,7 @@ use Illuminate\Support\ServiceProvider;
 
 class MoneyServiceProvider extends ServiceProvider
 {
-    /**
-     * Register services.
-     *
-     * @return void
-     */
+    #[\Override]
     public function register(): void
     {
         $this->mergeConfigFrom(
@@ -18,11 +14,6 @@ class MoneyServiceProvider extends ServiceProvider
         );
     }
 
-    /**
-     * Bootstrap services.
-     *
-     * @return void
-     */
     public function boot(): void
     {
         $this->publishes([

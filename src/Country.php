@@ -15,7 +15,7 @@ class Country
 
     public static function options(): array
     {
-        $class = new ReflectionClass(__CLASS__);
+        $class = new ReflectionClass(self::class);
 
         $values = array_values($class->getConstants());
 

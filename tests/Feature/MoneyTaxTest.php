@@ -85,21 +85,25 @@ class MoneyTaxTest extends TestCase
 
 class Tax implements \Supplycart\Money\Contracts\Tax
 {
+    #[\Override]
     public function getTaxRate(): string
     {
         return '9.21';
     }
 
+    #[\Override]
     public function getTaxDescription(): string
     {
         return '';
     }
 
+    #[\Override]
     public function getTaxCountry(): string
     {
         return Country::THE_NETHERLANDS;
     }
 
+    #[\Override]
     public function getTaxCurrency(): string
     {
         return Currency::EUR;
