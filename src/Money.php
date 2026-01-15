@@ -24,7 +24,7 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
 
     public int $scale;
 
-    public static RoundingMode $roundingMode = RoundingMode::HALF_UP;
+    public static int $roundingMode = RoundingMode::HALF_UP;
 
     public function __construct($amount = 0, string $currency = Currency::EUR, $scale = 2)
     {
@@ -37,12 +37,12 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         $this->scale = $scale;
     }
 
-    public static function of($amount = 0, string $currency = Currency::EUR, $decimal = 2): Money
+    public static function of($amount = 0, string $currency = Currency::EUR, $decimal = 2): self
     {
         return new Money($amount, $currency, $decimal);
     }
 
-    public static function parse($value, $currency = null): Money
+    public static function parse($value, $currency = null): self
     {
         $currency ??= Currency::default();
 
@@ -65,14 +65,14 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         return new Money($value, $currency);
     }
 
-    public static function fromCents(int $amount, string $currency = Currency::EUR): Money
+    public static function fromCents(int $amount, string $currency = Currency::EUR): self
     {
         $instance = BrickMoney::ofMinor($amount, $currency);
 
         return new Money($instance->getMinorAmount(), $currency);
     }
 
-    public static function fromDecimal(string $amount, string $currency = Currency::EUR): Money
+    public static function fromDecimal(string $amount, string $currency = Currency::EUR): self
     {
         $instance = BrickMoney::of($amount, $currency);
 
@@ -117,7 +117,7 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         return (string) $this->instance->getCurrency();
     }
 
-    public function add($value): Money
+    public function add($value): self
     {
         if (!$value instanceof self) {
             $value = self::of($value, $this->getCurrency(), $this->scale);
@@ -133,7 +133,7 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
 			);
     }
 
-    public function addCents($value): Money
+    public function addCents($value): self
     {
         if (!$value instanceof self) {
             $value = self::fromCents($value, $this->getCurrency());
@@ -149,7 +149,7 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         );
     }
 
-    public function subtract($value): Money
+    public function subtract($value): self
     {
         if (!$value instanceof self) {
             $value = self::of($value, $this->getCurrency(), $this->scale);
@@ -161,7 +161,8 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
             $this->scale
         );
     }
-    public function subtractCents($value): static
+
+    public function subtractCents($value): self
     {
         if (!$value instanceof self) {
             $value = self::fromCents($value, $this->getCurrency());
@@ -174,28 +175,28 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         );
     }
 
-    public function multiply($value): Money
+    public function multiply($value): self
     {
         $value = $this->instance->multipliedBy($value, self::$roundingMode);
 
         return new Money($value->getMinorAmount(), $value->getCurrency(), $this->scale);
     }
 
-    public function divide($value): Money
+    public function divide($value): self
     {
         $value = $this->instance->dividedBy($value, self::$roundingMode);
 
         return new Money($value->getMinorAmount(), $this->instance->getCurrency(), $this->scale);
     }
 
-    public function withTax(TaxContract $tax): Money
+    public function withTax(TaxContract $tax): self
     {
         $this->tax = $tax;
 
         return $this;
     }
 
-    public function getTaxAmount($quantity = 1): Money
+    public function getTaxAmount($quantity = 1): self
     {
         if (!$this->tax) {
             return self::zero($this->getCurrency());
@@ -209,7 +210,7 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         return self::of($taxValue->getMinorAmount(), $this->getCurrency(), $this->scale);
     }
 
-    public function getTaxAmountFromInclusiveTax(): Money
+    public function getTaxAmountFromInclusiveTax(): self
     {
         if (!$this->tax) {
             return $this;
@@ -235,7 +236,7 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
             ->toScale($this->scale + 2, self::$roundingMode);
     }
 
-    public function afterTax($quantity = 1): Money
+    public function afterTax($quantity = 1): self
     {
         if (!$this->tax) {
             return $this;
@@ -249,7 +250,7 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         return new Money($afterTax->getMinorAmount(), $this->getCurrency(), $this->scale);
     }
 
-    public function beforeTax(): Money
+    public function beforeTax(): self
     {
         if (!$this->tax) {
             return $this;
@@ -262,7 +263,7 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         return new Money($beforeTax->getMinorAmount(), $this->getCurrency(), $this->scale);
     }
 
-    public static function zero(string $currency = Currency::EUR): Money
+    public static function zero(string $currency = Currency::EUR): self
     {
         return new Money(0, $currency);
     }
@@ -300,20 +301,20 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
     }
 
     #[\Override]
-    public function jsonSerialize(): mixed
+    public function jsonSerialize(): array
     {
         return $this->toArray();
     }
 
     /**
-     * This function is to cater more than two decimal points
+     * This function is to cater to more than two decimal points
      */
     public function getDivider(): int
     {
         return $this->scale === 2 ? 1 : 10 ** ($this->scale - 2);
     }
 
-    public function convertToDifferentDecimalPoint(int $newDecimalPoint): Money
+    public function convertToDifferentDecimalPoint(int $newDecimalPoint): self
     {
         $differenceInScale = $newDecimalPoint - $this->scale;
 
@@ -326,7 +327,7 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         return new Money($newValue->getMinorAmount(), $newValue->getCurrency(), $newDecimalPoint);
     }
 
-    private function createInstance($amount = 0, string $currency = Currency::EUR, $scale = 2)
+    private function createInstance($amount = 0, string $currency = Currency::EUR, $scale = 2): BrickMoney
     {
         $brickCurrency = BrickCurrency::of($currency);
         $brickCurrency = new BrickCurrency($brickCurrency->getCurrencyCode(), $brickCurrency->getNumericCode(), $brickCurrency->getName(), 2);

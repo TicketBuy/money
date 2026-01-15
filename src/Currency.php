@@ -6,7 +6,7 @@ use ReflectionClass;
 
 class Currency
 {
-    public const EUR = 'EUR';
+    public const string EUR = 'EUR';
 
     public static function default(): string
     {
@@ -15,6 +15,6 @@ class Currency
 
     public static function options(): array
     {
-        return (new ReflectionClass(__CLASS__))->getConstants();
+        return (new ReflectionClass(self::class))->getConstants();
     }
 }

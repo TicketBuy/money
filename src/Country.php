@@ -6,7 +6,7 @@ use ReflectionClass;
 
 class Country
 {
-    public const THE_NETHERLANDS = 'The Netherlands';
+    public const string THE_NETHERLANDS = 'The Netherlands';
 
     public static function default(): string
     {
