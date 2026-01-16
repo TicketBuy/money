@@ -24,7 +24,7 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
 
     public int $scale;
 
-    public static int $roundingMode = RoundingMode::HALF_UP;
+    public static RoundingMode $roundingMode = RoundingMode::HALF_UP;
 
     public function __construct($amount = 0, string $currency = Currency::EUR, $scale = 2)
     {
