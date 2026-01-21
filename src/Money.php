@@ -16,7 +16,7 @@ use JsonSerializable;
 use Stringable;
 use Supplycart\Money\Contracts\Tax as TaxContract;
 
-final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
+final class Money implements Arrayable, Jsonable, JsonSerializable, Stringable
 {
     private readonly BrickMoney $instance;
 
@@ -79,6 +79,18 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
         return new Money($instance->getMinorAmount(), $currency);
     }
 
+    public function toRational(): RationalMoney
+    {
+        return new RationalMoney($this->instance->getAmount()->toBigRational(), $this->instance->getCurrency());
+    }
+
+    public static function fromRational(RationalMoney $amount, Context $context, string $currency = Currency::EUR): Money
+    {
+        $instance = $amount->to($context, self::$roundingMode);
+
+        return new Money($instance->getMinorAmount(), $currency);
+    }
+
     public function getAmount(): int
     {
         return $this->instance->getAmount()
@@ -119,23 +131,23 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
 
     public function add($value): self
     {
-        if (!$value instanceof self) {
+        if (! $value instanceof self) {
             $value = self::of($value, $this->getCurrency(), $this->scale);
         }
 
         return new Money(
             $this->instance->plus(
                 $value->multiply($this->getDivider()),
-					self::$roundingMode
-				)->getMinorAmount(),
-				$this->getCurrency(),
-				$this->scale
-			);
+                self::$roundingMode
+            )->getMinorAmount(),
+            $this->getCurrency(),
+            $this->scale
+        );
     }
 
     public function addCents($value): self
     {
-        if (!$value instanceof self) {
+        if (! $value instanceof self) {
             $value = self::fromCents($value, $this->getCurrency());
         }
 
@@ -151,11 +163,11 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
 
     public function subtract($value): self
     {
-        if (!$value instanceof self) {
+        if (! $value instanceof self) {
             $value = self::of($value, $this->getCurrency(), $this->scale);
         }
 
-		return new Money(
+        return new Money(
             $this->instance->minus($value->multiply($this->getDivider()))->getMinorAmount(),
             $this->instance->getCurrency(),
             $this->scale
@@ -164,7 +176,7 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
 
     public function subtractCents($value): self
     {
-        if (!$value instanceof self) {
+        if (! $value instanceof self) {
             $value = self::fromCents($value, $this->getCurrency());
         }
 
@@ -198,7 +210,7 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
 
     public function getTaxAmount($quantity = 1): self
     {
-        if (!$this->tax) {
+        if (! $this->tax) {
             return self::zero($this->getCurrency());
         }
 
@@ -212,7 +224,7 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
 
     public function getTaxAmountFromInclusiveTax(): self
     {
-        if (!$this->tax) {
+        if (! $this->tax) {
             return $this;
         }
 
@@ -226,7 +238,7 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
 
     public function getTaxRate(): BigDecimal
     {
-        if (!$this->tax) {
+        if (! $this->tax) {
             return BigDecimal::zero();
         }
 
@@ -238,7 +250,7 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
 
     public function afterTax($quantity = 1): self
     {
-        if (!$this->tax) {
+        if (! $this->tax) {
             return $this;
         }
 
@@ -252,7 +264,7 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
 
     public function beforeTax(): self
     {
-        if (!$this->tax) {
+        if (! $this->tax) {
             return $this;
         }
 
@@ -280,7 +292,7 @@ final class Money implements Arrayable, Jsonable, Stringable, JsonSerializable
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[\Override]
     public function toArray(): array

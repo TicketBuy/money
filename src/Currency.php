@@ -8,6 +8,8 @@ class Currency
 {
     public const string EUR = 'EUR';
 
+    public const string USD = 'USD';
+
     public static function default(): string
     {
         return self::EUR;

@@ -63,7 +63,7 @@ class MoneyTaxTest extends TestCase
 
     public function test_can_get_before_tax_amount_for_4_decimal_place(): void
     {
-        $money = Money::of(10921,Currency::EUR, 4)->withTax(new Tax);
+        $money = Money::of(10921, Currency::EUR, 4)->withTax(new Tax);
         $this->assertEquals(10000, $money->beforeTax()->getAmount());
         $this->assertEquals(1.0000, $money->beforeTax()->getDecimalAmount());
     }

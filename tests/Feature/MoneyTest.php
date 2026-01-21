@@ -2,8 +2,6 @@
 
 namespace Supplycart\Money\Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Supplycart\Money\Currency;
 use Supplycart\Money\Money;
 use Supplycart\Money\Tests\TestCase;
@@ -148,7 +146,7 @@ class MoneyTest extends TestCase
         $this->assertIsArray((array) $money);
         $this->assertEquals([
             'amount' => 0,
-            'currency' => Currency::EUR
+            'currency' => Currency::EUR,
         ], $money->toArray());
 
         $money = Money::of(252);
@@ -156,7 +154,7 @@ class MoneyTest extends TestCase
         $this->assertIsArray((array) $money);
         $this->assertEquals([
             'amount' => 252,
-            'currency' => Currency::EUR
+            'currency' => Currency::EUR,
         ], $money->toArray());
     }
 
@@ -184,11 +182,11 @@ class MoneyTest extends TestCase
         $money = Money::of(120001, Currency::EUR, 4);
         $result = $money->convertToDifferentDecimalPoint(2);
 
-        //previous
+        // previous
         $this->assertEquals('12.0001', $money->getDecimalAmount());
         $this->assertEquals(120001, $money->getAmount());
 
-        //after
+        // after
         $this->assertEquals('12.00', $result->getDecimalAmount());
         $this->assertEquals(1200, $result->getAmount());
     }
@@ -198,11 +196,11 @@ class MoneyTest extends TestCase
         $money = Money::of(1201, Currency::EUR, 2);
         $result = $money->convertToDifferentDecimalPoint(4);
 
-        //previous
+        // previous
         $this->assertEquals('12.01', $money->getDecimalAmount());
         $this->assertEquals(1201, $money->getAmount());
 
-        //after
+        // after
         $this->assertEquals('12.0100', $result->getDecimalAmount());
         $this->assertEquals(120100, $result->getAmount());
     }

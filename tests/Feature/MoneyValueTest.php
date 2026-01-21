@@ -2,7 +2,6 @@
 
 namespace Supplycart\Money\Tests\Feature;
 
-use Supplycart\Money\Currency;
 use Supplycart\Money\Money;
 use Supplycart\Money\Tests\Stubs\Product;
 use Supplycart\Money\Tests\TestCase;
