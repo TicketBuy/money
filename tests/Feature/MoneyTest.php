@@ -2,6 +2,7 @@
 
 namespace Supplycart\Money\Tests\Feature;
 
+use Brick\Money\Exception\MoneyMismatchException;
 use Supplycart\Money\Currency;
 use Supplycart\Money\Money;
 use Supplycart\Money\Tests\TestCase;
@@ -219,5 +220,148 @@ class MoneyTest extends TestCase
         $result = $money->multiply('0.5')->getAmount();
 
         $this->assertEquals(6173, $result);
+    }
+
+    public function test_add_throws_exception_on_currency_mismatch(): void
+    {
+        $eur = Money::of(1000);
+        $usd = Money::of(500, Currency::USD);
+
+        $this->expectException(MoneyMismatchException::class);
+
+        $eur->add($usd);
+    }
+
+    public function test_subtract_throws_exception_on_currency_mismatch(): void
+    {
+        $eur = Money::of(1000);
+        $usd = Money::of(500, Currency::USD);
+
+        $this->expectException(MoneyMismatchException::class);
+
+        $eur->subtract($usd);
+    }
+
+    public function test_add_cents_throws_exception_on_currency_mismatch(): void
+    {
+        $eur = Money::of(1000);
+        $usd = Money::of(500, Currency::USD);
+
+        $this->expectException(MoneyMismatchException::class);
+
+        $eur->addCents($usd);
+    }
+
+    public function test_subtract_cents_throws_exception_on_currency_mismatch(): void
+    {
+        $eur = Money::of(1000);
+        $usd = Money::of(500, Currency::USD);
+
+        $this->expectException(MoneyMismatchException::class);
+
+        $eur->subtractCents($usd);
+    }
+
+    public function test_add_same_currency_succeeds(): void
+    {
+        $usd1 = Money::of(1000, Currency::USD);
+        $usd2 = Money::of(500, Currency::USD);
+
+        $result = $usd1->add($usd2);
+
+        $this->assertEquals(1500, $result->getAmount());
+    }
+
+    public function test_subtract_same_currency_succeeds(): void
+    {
+        $usd1 = Money::of(1000, Currency::USD);
+        $usd2 = Money::of(300, Currency::USD);
+
+        $result = $usd1->subtract($usd2);
+
+        $this->assertEquals(700, $result->getAmount());
+    }
+
+    public function test_operations_return_new_instances(): void
+    {
+        $original = Money::of(1000);
+
+        $added = $original->add(500);
+        $subtracted = $original->subtract(500);
+        $multiplied = $original->multiply(2);
+        $divided = $original->divide(2);
+
+        $this->assertEquals(1000, $original->getAmount());
+        $this->assertEquals(1500, $added->getAmount());
+        $this->assertEquals(500, $subtracted->getAmount());
+        $this->assertEquals(2000, $multiplied->getAmount());
+        $this->assertEquals(500, $divided->getAmount());
+    }
+
+    public function test_money_preserves_currency(): void
+    {
+        $usd = Money::of(1000, Currency::USD);
+
+        $this->assertEquals(Currency::USD, $usd->getCurrency());
+        $this->assertEquals(Currency::USD, $usd->add(500)->getCurrency());
+        $this->assertEquals(Currency::USD, $usd->subtract(500)->getCurrency());
+        $this->assertEquals(Currency::USD, $usd->multiply(2)->getCurrency());
+        $this->assertEquals(Currency::USD, $usd->divide(2)->getCurrency());
+    }
+
+    public function test_money_to_string_returns_decimal_amount(): void
+    {
+        $money = Money::of(1050);
+
+        $this->assertEquals('10.50', (string) $money);
+    }
+
+    public function test_money_to_json(): void
+    {
+        $money = Money::of(1500, Currency::USD);
+
+        $json = json_decode($money->toJson(), true);
+
+        $this->assertEquals(1500, $json['amount']);
+        $this->assertEquals(Currency::USD, $json['currency']);
+    }
+
+    public function test_money_json_serialize(): void
+    {
+        $money = Money::of(1500, Currency::USD);
+
+        $serialized = $money->jsonSerialize();
+
+        $this->assertEquals(['amount' => 1500, 'currency' => Currency::USD], $serialized);
+    }
+
+    public function test_money_is_zero(): void
+    {
+        $this->assertTrue(Money::zero()->isZero());
+        $this->assertTrue(Money::of()->isZero());
+        $this->assertFalse(Money::of(1)->isZero());
+    }
+
+    public function test_money_zero_with_currency(): void
+    {
+        $zero = Money::zero(Currency::USD);
+
+        $this->assertTrue($zero->isZero());
+        $this->assertEquals(Currency::USD, $zero->getCurrency());
+    }
+
+    public function test_money_from_cents(): void
+    {
+        $money = Money::fromCents(1500);
+
+        $this->assertEquals(1500, $money->getAmount());
+    }
+
+    public function test_money_from_cents_with_currency(): void
+    {
+        $money = Money::fromCents(1500, Currency::USD);
+
+        $this->assertEquals(1500, $money->getAmount());
+        $this->assertEquals(Currency::USD, $money->getCurrency());
     }
 }

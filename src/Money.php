@@ -8,6 +8,7 @@ use Brick\Math\RoundingMode;
 use Brick\Money\Context;
 use Brick\Money\Context\CustomContext;
 use Brick\Money\Currency as BrickCurrency;
+use Brick\Money\Exception\MoneyMismatchException;
 use Brick\Money\Money as BrickMoney;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -39,6 +40,10 @@ final class Money implements Arrayable, Jsonable, JsonSerializable, Stringable
 
     public static function of($amount = 0, string $currency = Currency::EUR, $decimal = 2): self
     {
+        if ($amount instanceof self) {
+            return new Money($amount->getAmount(), $amount->getCurrency(), $decimal);
+        }
+
         return new Money($amount, $currency, $decimal);
     }
 
@@ -135,6 +140,8 @@ final class Money implements Arrayable, Jsonable, JsonSerializable, Stringable
             $value = self::of($value, $this->getCurrency(), $this->scale);
         }
 
+        $this->assertSameCurrency($value);
+
         return new Money(
             $this->instance->plus(
                 $value->multiply($this->getDivider()),
@@ -150,6 +157,8 @@ final class Money implements Arrayable, Jsonable, JsonSerializable, Stringable
         if (! $value instanceof self) {
             $value = self::fromCents($value, $this->getCurrency());
         }
+
+        $this->assertSameCurrency($value);
 
         return new Money(
             $this->instance->plus(
@@ -167,6 +176,8 @@ final class Money implements Arrayable, Jsonable, JsonSerializable, Stringable
             $value = self::of($value, $this->getCurrency(), $this->scale);
         }
 
+        $this->assertSameCurrency($value);
+
         return new Money(
             $this->instance->minus($value->multiply($this->getDivider()))->getMinorAmount(),
             $this->instance->getCurrency(),
@@ -179,6 +190,8 @@ final class Money implements Arrayable, Jsonable, JsonSerializable, Stringable
         if (! $value instanceof self) {
             $value = self::fromCents($value, $this->getCurrency());
         }
+
+        $this->assertSameCurrency($value);
 
         return new Money(
             $this->instance->minus($value->multiply($this->getDivider()))->getMinorAmount(),
@@ -337,6 +350,16 @@ final class Money implements Arrayable, Jsonable, JsonSerializable, Stringable
             : $this->instance->dividedBy($dividerOrMultiplier, self::$roundingMode);
 
         return new Money($newValue->getMinorAmount(), $newValue->getCurrency(), $newDecimalPoint);
+    }
+
+    private function assertSameCurrency(self $other): void
+    {
+        if ($this->getCurrency() !== $other->getCurrency()) {
+            throw MoneyMismatchException::currencyMismatch(
+                BrickCurrency::of($this->getCurrency()),
+                BrickCurrency::of($other->getCurrency()),
+            );
+        }
     }
 
     private function createInstance($amount = 0, string $currency = Currency::EUR, $scale = 2): BrickMoney

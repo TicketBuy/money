@@ -35,4 +35,12 @@ class MoneyParseTest extends TestCase
 
         $this->assertEquals(1500, $money->getAmount());
     }
+
+    public function test_can_create_money_of_from_money_object(): void
+    {
+        $money = Money::of(Money::of(1500));
+
+        $this->assertEquals(1500, $money->getAmount());
+        $this->assertEquals(Currency::EUR, $money->getCurrency());
+    }
 }
