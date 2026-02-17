@@ -54,7 +54,7 @@ final class RationalMoney
             $value = $value->getAmount();
         }
 
-        return new self($this->instance->plus($value)->getAmount(), $this->instance->getCurrency());
+        return new self($this->instance->plus((string) $value)->getAmount(), $this->instance->getCurrency());
     }
 
     public function subtract($value): self
@@ -67,7 +67,7 @@ final class RationalMoney
             $value = $value->getAmount();
         }
 
-        return new self($this->instance->minus($value)->getAmount(), $this->instance->getCurrency());
+        return new self($this->instance->minus((string) $value)->getAmount(), $this->instance->getCurrency());
     }
 
     public function multiply($value): self
@@ -76,7 +76,7 @@ final class RationalMoney
             $value = $value->getAmount();
         }
 
-        return new self($this->instance->multipliedBy($value)->getAmount(), $this->instance->getCurrency());
+        return new self($this->instance->multipliedBy((string) $value)->getAmount(), $this->instance->getCurrency());
     }
 
     public function divide($value): self
@@ -85,7 +85,7 @@ final class RationalMoney
             $value = $value->getAmount();
         }
 
-        return new self($this->instance->dividedBy($value)->getAmount(), $this->instance->getCurrency());
+        return new self($this->instance->dividedBy((string) $value)->getAmount(), $this->instance->getCurrency());
     }
 
     public function simplified(): self

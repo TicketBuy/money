@@ -211,14 +211,14 @@ final class Money implements Arrayable, Jsonable, JsonSerializable, Stringable
 
     public function multiply($value): self
     {
-        $value = $this->instance->multipliedBy($value, self::$roundingMode);
+        $value = $this->instance->multipliedBy((string) $value, self::$roundingMode);
 
         return new Money($value->getMinorAmount(), $value->getCurrency(), $this->scale);
     }
 
     public function divide($value): self
     {
-        $value = $this->instance->dividedBy($value, self::$roundingMode);
+        $value = $this->instance->dividedBy((string) $value, self::$roundingMode);
 
         return new Money($value->getMinorAmount(), $this->instance->getCurrency(), $this->scale);
     }
@@ -238,7 +238,7 @@ final class Money implements Arrayable, Jsonable, JsonSerializable, Stringable
 
         $taxValue = $this->instance->toRational()
             ->multipliedBy($this->getTaxRate())
-            ->multipliedBy($quantity)
+            ->multipliedBy((string) $quantity)
             ->to($this->instance->getContext(), self::$roundingMode);
 
         return self::of($taxValue->getMinorAmount(), $this->getCurrency(), $this->scale);
@@ -278,7 +278,7 @@ final class Money implements Arrayable, Jsonable, JsonSerializable, Stringable
 
         $afterTax = $this->instance->toRational()
             ->multipliedBy($this->getTaxRate()->plus(1))
-            ->multipliedBy($quantity)
+            ->multipliedBy((string) $quantity)
             ->to($this->instance->getContext(), self::$roundingMode);
 
         return new Money($afterTax->getMinorAmount(), $this->getCurrency(), $this->scale);
