@@ -24,7 +24,7 @@ final class RationalMoney
         $brickCurrency = BrickCurrency::of($currency);
         $brickCurrency = new BrickCurrency($brickCurrency->getCurrencyCode(), $brickCurrency->getNumericCode(), $brickCurrency->getName(), 2);
 
-        $bigRational = BigRational::of($amount);
+        $bigRational = BigRational::of((string) $amount);
 
         return new RationalMoney($bigRational, $brickCurrency);
     }

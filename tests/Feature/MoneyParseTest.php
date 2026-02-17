@@ -36,6 +36,20 @@ class MoneyParseTest extends TestCase
         $this->assertEquals(1500, $money->getAmount());
     }
 
+    public function test_can_parse_money_from_float(): void
+    {
+        $money = Money::parse(1550.0);
+
+        $this->assertEquals(1550, $money->getAmount());
+    }
+
+    public function test_can_parse_money_from_float_with_decimals(): void
+    {
+        $money = Money::parse(1550.50);
+
+        $this->assertEquals(1551, $money->getAmount());
+    }
+
     public function test_can_create_money_of_from_money_object(): void
     {
         $money = Money::of(Money::of(1500));

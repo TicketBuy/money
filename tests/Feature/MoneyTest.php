@@ -364,4 +364,60 @@ class MoneyTest extends TestCase
         $this->assertEquals(1500, $money->getAmount());
         $this->assertEquals(Currency::USD, $money->getCurrency());
     }
+
+    public function test_can_add_different_scales(): void
+    {
+        $a = Money::of(1550);  // €15.50
+        $b = Money::of(2345, Currency::EUR, 4);  // €0.2345
+
+        // €15.50 + €0.2345 = €15.7345 (scale 4)
+        $result1 = $a->add($b);
+        $this->assertEquals('15.7345', $result1->getDecimalAmount());
+        $this->assertEquals(4, $result1->scale);
+
+        $result2 = $b->add($a);
+        $this->assertEquals('15.7345', $result2->getDecimalAmount());
+        $this->assertEquals(4, $result2->scale);
+    }
+
+    public function test_can_subtract_different_scales(): void
+    {
+        $a = Money::of(1550, Currency::EUR, 2);  // €15.50
+        $b = Money::of(2345, Currency::EUR, 4);  // €0.2345
+
+        // €15.50 - €0.2345 = €15.2655 (scale 4)
+        $result1 = $a->subtract($b);
+        $this->assertEquals('15.2655', $result1->getDecimalAmount());
+        $this->assertEquals(4, $result1->scale);
+
+        $result2 = $b->subtract($a);
+        $this->assertEquals('-15.2655', $result2->getDecimalAmount());
+        $this->assertEquals(4, $result2->scale);
+    }
+
+    public function test_can_round_to_invoice_precision(): void
+    {
+        $a = Money::of(1550);                        // €15.50
+        $b = Money::of(2345, Currency::EUR, 4);      // €0.2345
+
+        $precise = $a->subtract($b);                 // €15.2655 (scale 4)
+        $invoice = $precise->convertToDifferentDecimalPoint(2);
+
+        $this->assertEquals('15.27', $invoice->getDecimalAmount());
+        $this->assertEquals(1527, $invoice->getAmount());
+        $this->assertEquals(2, $invoice->scale);
+    }
+
+    public function test_can_multiply_unit_price_with_four_decimals(): void
+    {
+        $price = Money::of(2345, Currency::EUR, 4);
+
+        $this->assertEquals('0.2345', $price->getDecimalAmount());
+        $this->assertEquals(2345, $price->getAmount());
+
+        $total = $price->multiply(1000);
+
+        $this->assertEquals('234.5000', $total->getDecimalAmount());
+        $this->assertEquals(2345000, $total->getAmount());
+    }
 }

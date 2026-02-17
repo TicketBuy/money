@@ -14,6 +14,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonException;
 use JsonSerializable;
+use Override;
 use Stringable;
 use Supplycart\Money\Contracts\Tax as TaxContract;
 
@@ -25,7 +26,7 @@ final class Money implements Arrayable, Jsonable, JsonSerializable, Stringable
 
     public int $scale;
 
-    public static RoundingMode $roundingMode = RoundingMode::HALF_UP;
+    public static RoundingMode $roundingMode = RoundingMode::HalfUp;
 
     public function __construct($amount = 0, string $currency = Currency::EUR, $scale = 2)
     {
@@ -64,7 +65,7 @@ final class Money implements Arrayable, Jsonable, JsonSerializable, Stringable
         }
 
         if (is_float($value)) {
-            return new Money((string) BigDecimal::of($value)->getUnscaledValue(), $currency);
+            return new Money((string) $value, $currency);
         }
 
         return new Money($value, $currency);
@@ -89,7 +90,7 @@ final class Money implements Arrayable, Jsonable, JsonSerializable, Stringable
         return new RationalMoney($this->instance->getAmount()->toBigRational(), $this->instance->getCurrency());
     }
 
-    public static function fromRational(RationalMoney $amount, Context $context, string $currency = Currency::EUR): Money
+    public static function fromRational(RationalMoney $amount, Context $context, string $currency = Currency::EUR): self
     {
         $instance = $amount->to($context, self::$roundingMode);
 
@@ -142,13 +143,17 @@ final class Money implements Arrayable, Jsonable, JsonSerializable, Stringable
 
         $this->assertSameCurrency($value);
 
+        $scale = max($this->scale, $value->scale);
+        $a = $this->scale < $scale ? $this->convertToDifferentDecimalPoint($scale) : $this;
+        $b = $value->scale < $scale ? $value->convertToDifferentDecimalPoint($scale) : $value;
+
         return new Money(
-            $this->instance->plus(
-                $value->multiply($this->getDivider()),
+            $a->instance->plus(
+                $b->multiply($a->getDivider()),
                 self::$roundingMode
             )->getMinorAmount(),
             $this->getCurrency(),
-            $this->scale
+            $scale
         );
     }
 
@@ -178,10 +183,14 @@ final class Money implements Arrayable, Jsonable, JsonSerializable, Stringable
 
         $this->assertSameCurrency($value);
 
+        $scale = max($this->scale, $value->scale);
+        $a = $this->scale < $scale ? $this->convertToDifferentDecimalPoint($scale) : $this;
+        $b = $value->scale < $scale ? $value->convertToDifferentDecimalPoint($scale) : $value;
+
         return new Money(
-            $this->instance->minus($value->multiply($this->getDivider()))->getMinorAmount(),
-            $this->instance->getCurrency(),
-            $this->scale
+            $a->instance->minus($b->multiply($a->getDivider()))->getMinorAmount(),
+            $this->getCurrency(),
+            $scale
         );
     }
 
@@ -298,7 +307,7 @@ final class Money implements Arrayable, Jsonable, JsonSerializable, Stringable
         return $this->instance->isZero();
     }
 
-    #[\Override]
+    #[Override]
     public function __toString(): string
     {
         return $this->getDecimalAmount();
@@ -307,7 +316,7 @@ final class Money implements Arrayable, Jsonable, JsonSerializable, Stringable
     /**
      * {@inheritDoc}
      */
-    #[\Override]
+    #[Override]
     public function toArray(): array
     {
         return [
@@ -319,13 +328,13 @@ final class Money implements Arrayable, Jsonable, JsonSerializable, Stringable
     /**
      * @throws JsonException
      */
-    #[\Override]
+    #[Override]
     public function toJson($options = 0): bool|string
     {
         return json_encode($this->toArray(), JSON_THROW_ON_ERROR | $options);
     }
 
-    #[\Override]
+    #[Override]
     public function jsonSerialize(): array
     {
         return $this->toArray();
@@ -368,7 +377,7 @@ final class Money implements Arrayable, Jsonable, JsonSerializable, Stringable
         $brickCurrency = new BrickCurrency($brickCurrency->getCurrencyCode(), $brickCurrency->getNumericCode(), $brickCurrency->getName(), 2);
 
         $context = new CustomContext($scale);
-        $bigRational = BigRational::of($amount)->dividedBy(10 ** $brickCurrency->getDefaultFractionDigits());
+        $bigRational = BigRational::of((string) $amount)->dividedBy(10 ** $brickCurrency->getDefaultFractionDigits());
 
         return BrickMoney::create($bigRational, $brickCurrency, $context, self::$roundingMode);
     }
