@@ -64,11 +64,7 @@ final class Money implements Arrayable, Jsonable, JsonSerializable, Stringable
             return new Money(data_get($value, 'amount', 0), data_get($value, 'currency', $currency));
         }
 
-        if (is_float($value)) {
-            return new Money((string) $value, $currency);
-        }
-
-        return new Money($value, $currency);
+        return new Money((string) $value, $currency);
     }
 
     public static function fromCents(int $amount, string $currency = Currency::EUR): self
