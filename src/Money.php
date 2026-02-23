@@ -113,7 +113,7 @@ final class Money implements Arrayable, Jsonable, JsonSerializable, Stringable
     {
         $locale ??= Locale::$currencies[(string) $this->instance->getCurrency()];
 
-        return $this->instance->formatTo($locale);
+        return $this->instance->formatToLocale($locale);
     }
 
     public function toNumberFormat($decimal = 2, $decimal_separator = '.', $thousands_separator = ','): string

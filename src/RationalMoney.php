@@ -47,7 +47,7 @@ final class RationalMoney
     public function add($value): self
     {
         if ($value instanceof self) {
-            if (! $this->instance->getCurrency()->is($value->getCurrency())) {
+            if (! $this->instance->getCurrency()->isEqualTo($value->getCurrency())) {
                 throw MoneyMismatchException::currencyMismatch($this->instance->getCurrency(), $value->instance->getCurrency());
             }
 
@@ -60,7 +60,7 @@ final class RationalMoney
     public function subtract($value): self
     {
         if ($value instanceof self) {
-            if (! $this->instance->getCurrency()->is($value->getCurrency())) {
+            if (! $this->instance->getCurrency()->isEqualTo($value->getCurrency())) {
                 throw MoneyMismatchException::currencyMismatch($this->instance->getCurrency(), $value->instance->getCurrency());
             }
 
